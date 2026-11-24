@@ -1,0 +1,5 @@
+{
+  "version": "1.1.1",
+  "bin": "firmware/prima3.bin",
+  "notes": "ABOUT page: PC-upload (OTA) rows hidden unless ticked in SETTINGS; PROJECT DETAILS table"
+}

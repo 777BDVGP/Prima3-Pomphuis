@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prima3 Pomphuis Installer</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1f2933;--muted:#5f6b7a;--line:#d9dee5;--acc:#0369a1;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--fg:#e2e8f0;--muted:#94a3b8;--line:#334155;--acc:#38bdf8;--warn:#f59e0b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.6rem;margin:0 0 4px}
+h2{font-size:1.15rem;margin:28px 0 8px}
+p{margin:6px 0}
+.sub{color:var(--muted);margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0}
+.card h3{margin:0 0 4px;font-size:1.05rem}
+.ver{font-size:.85rem;color:var(--muted)}
+ol,ul{padding-left:22px}li{margin:4px 0}
+.note{border-left:4px solid var(--warn);background:var(--card);padding:10px 14px;border-radius:6px;margin:16px 0}
+.unsupported{display:none;color:var(--warn);font-weight:600}
+esp-web-install-button[install-unsupported] .unsupported{display:block}
+a{color:var(--acc)}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:0 4px;word-break:break-all}
+</style>
+</head>
+<body>
+<main>
+<h1>Prima3 Pomphuis</h1>
+<p><a href="https://github.com/777BDVGP/Prima3-Pomphuis#readme">Build guide (README)</a> &middot; <a href="https://github.com/777BDVGP/Prima3-Pomphuis">GitHub</a></p>
+<p class="sub">Pump house and irrigation controller: fills a water tank from a borehole, runs 9 irrigation
+zones through 7 solenoid valves, drives the tank filter pump and keeps track of two households sharing one
+borehole &mdash; on a WEMOS LOLIN S3 Mini (ESP32-S3). Everything runs in a web page on your own WiFi.</p>
+
+<div class="card">
+<h3>Install on a new S3 Mini</h3>
+<p class="ver">Firmware version: <span id="ver">&hellip;</span></p>
+<esp-web-install-button manifest="manifest.json">
+  <span slot="unsupported" class="unsupported">Use Chrome or Edge on a PC or Mac &mdash; this browser cannot flash over USB.</span>
+</esp-web-install-button>
+<ol>
+<li>Plug the S3 Mini into the PC with a USB <b>data</b> cable and press <b>CONNECT</b> above.</li>
+<li>If no port shows up: hold <b>BOOT (0)</b>, tap <b>RST</b>, release <b>BOOT</b>, and try again.</li>
+<li>Choose <b>Erase</b> for a new board, then <b>Install</b> (about a minute).</li>
+</ol>
+</div>
+
+<h2>First start: choose your WiFi</h2>
+<ol>
+<li>The new controller opens its own WiFi hotspot <b>Prima3-Setup</b> (the LED blinks red fast).</li>
+<li>Connect a phone to it &mdash; the setup page opens by itself (otherwise browse to <code>http://192.168.4.1/</code>).</li>
+<li>Pick your network, type the password and give it a <b>fixed IP</b>, press <b>SAVE &amp; RESTART</b>.</li>
+<li>Put the phone back on your normal WiFi and open the fixed IP (or <code>http://primapomphuis.local/</code>).</li>
+</ol>
+<p>More networks: <b>SETTINGS &rarr; WiFi Networks</b> lists them with <b>DELETE</b> and <b>ADD NETWORK</b>
+(passwords are never shown). The controller tries the saved networks in range, strongest first &mdash; and when
+several access points share one network name (mesh / multi-AP), the strongest of them. Hold <b>BOOT</b> while
+powering up to open the setup hotspot again; it also opens by itself for 5 minutes when no network can be reached.</p>
+
+<h2>Updates</h2>
+<p>On the controller's <b>ABOUT</b> page: <b>CHECK FOR UPDATE</b> compares its version with the one on this site;
+<b>INSTALL FROM GITHUB</b> downloads and installs it (not while a zone irrigates or the borehole pump runs).
+Settings and logs are kept, and a failed download leaves the old firmware running.</p>
+<p>No internet at the controller? Download <a href="firmware/prima3.bin">prima3.bin</a> and use
+<b>UPLOAD &amp; INSTALL</b> on the ABOUT page.</p>
+
+<h2>Works with the Rain Gauge</h2>
+<p>Tick <b>Use Rain Gauge</b> on SETTINGS and enter the gauge's IP: the controller asks a
+<a href="https://777bdvgp.github.io/RainGauge/">Rain Gauge</a> every hour whether to irrigate today.</p>
+
+<div class="note">Licence: CC BY-NC 4.0 &mdash; free for personal use, not for sale. No warranty: this controls
+pumps and valves on mains power &mdash; have mains wiring done or checked by a qualified person.</div>
+</main>
+<script>
+fetch('version.json').then(r=>r.json()).then(j=>{document.getElementById('ver').textContent=j.version;}).catch(()=>{});
+</script>
+</body>
+</html>

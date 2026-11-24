@@ -1,0 +1,16 @@
+{
+  "name": "Prima3 Pomphuis",
+  "version": "1.1.1",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "firmware/prima3_full.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
