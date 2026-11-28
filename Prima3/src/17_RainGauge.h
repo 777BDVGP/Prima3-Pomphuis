@@ -27,6 +27,7 @@
 	#define RG_HTTP_TIMEOUT   3000                          // ms, connect and read
 
 	inline String RainGaugeStatus = "Not active";   // shown on the Settings page
+	inline String RainGaugeReason = "";             // gauge's last "reason" text — for the Irrigation Log skip / start lines
 	// Green / red badge under the IP row: what RAIN_OK_DO_IRRI is right now.
 	inline String RainGaugeBadge      = "";
 	inline String RainGaugeBadgeStyle = "";

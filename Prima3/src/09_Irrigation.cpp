@@ -969,11 +969,16 @@ void IrrigationShedule() {
 		    SheduleObject->IrrigateShedule[x].ShedStat == SHED_STATUS_DEACTIVE)
 		{
 			if (CurrentDateTime >= GetScheduledDateAndTime(x)) {
+				// Every skipped run is written to the Irrigation Log with the reason
+				// (until 1.1.2 a skip only moved the date on, so the log showed nothing).
+				const String& zone = IrriObject->Selection[x].SelectDescription;
 				if (SUSPEND_IRRI) {
 					// Suspended globally — skip this occurrence
+					SaveIrrigationReport("Skipped: " + zone + " - irrigation suspended");
 					UpdateToNextDate(x);
 				} else {
 					if (!RAIN_OK_DO_IRRI && IrriObject->Selection[x].RespectRainfail == IRRI_RESP_RAIN_YES) {
+						SaveIrrigationReport("Skipped: " + zone + " - rain gauge: " + RainGaugeReason);
 						UpdateToNextDate(x);
 					} else {
 						String Suspend = IRRI_SUSP_NO;
@@ -987,6 +992,8 @@ void IrrigationShedule() {
 							case DAY_SATDAY:  Suspend = IrriObject->Selection[x].SuspendSat; break;
 						}
 						if (Suspend == IRRI_SUSP_YES || IrriObject->Selection[x].SuspendALL == IRRI_SUSP_YES) {
+							SaveIrrigationReport("Skipped: " + zone + (IrriObject->Selection[x].SuspendALL == IRRI_SUSP_YES
+							                     ? String(" - zone suspended") : String(" - zone suspended on this weekday")));
 							UpdateToNextDate(x);
 						} else {
 							SetupIrrigateShedule(x, SHED_TYPE_AUTO);
@@ -1121,6 +1128,16 @@ void IrrigationShedule() {
 				IrriActivityStartMs = millis();
 				IrriActivityLine    = x;
 				TankFillAllowed     = false;
+				// Start line, so a running zone is in the log at once (the "Irrigation: … Dur:"
+				// line only comes when it ends).  If the gauge says skip but this zone
+				// ignores rain, say so — that is why it is watering.
+				{
+					String msg = "Started: " + IrriObject->Selection[x].SelectDescription +
+					             " for " + IrriObject->Selection[x].PeriodToIrrigate;
+					if (!RAIN_OK_DO_IRRI && IrriObject->Selection[x].RespectRainfail != IRRI_RESP_RAIN_YES)
+						msg += " - rain gauge says skip, but this zone has Respect Rain = No";
+					SaveIrrigationReport(msg);
+				}
 				break;   // Start only one zone at a time
 			}
 		}

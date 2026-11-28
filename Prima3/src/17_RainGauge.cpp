@@ -61,6 +61,17 @@ void SetupRainGauge() {
 	else               DEBUG_PRINTLN(F("RainGaugeTask creation FAILED"));
 }
 
+// True when at least one active, scheduled zone has "Respect Rain = Yes" —
+// only those zones are skipped when the gauge says so.
+bool AnyZoneRespectsRain(){
+	for (int x = 0; x < IRRIGATE_SELECTIONS; x++){
+		if (IrriObject->Selection[x].Status          == IRRI_STATUS_ACTIVE &&
+		    IrriObject->Selection[x].OperMode        == IRRI_MODE_SHEDULE &&
+		    IrriObject->Selection[x].RespectRainfail == IRRI_RESP_RAIN_YES) return true;
+	}
+	return false;
+}
+
 // "192.168.1.124" / "http://192.168.1.124" -> "http://192.168.1.124/"
 static String normaliseUrl(String url){
 	url.trim();
@@ -82,11 +93,15 @@ void MaintainRainGauge()
 	static bool     lastOk     = true;  // for logging only the change ok <-> failed
 	static int      lastLogged = -1;    // last logged answer (-1 none, 0 skip, 1 irrigate)
 
-	// Badge on the Settings page: green = Prima3 may irrigate, red = skip today.
+	// Badge on the Settings page: green = Prima3 may irrigate, red = skip today,
+	// orange = the gauge says skip but no active scheduled zone has
+	// "Respect Rain = Yes", so the zones water anyway (seen 2026-11-28).
 	if (!Params->RainGaugeEnable)  RainGaugeBadge = "IRRIGATE  (rain gauge off)";
 	else if (RAIN_OK_DO_IRRI)      RainGaugeBadge = "IRRIGATE";
-	else                           RainGaugeBadge = "NO IRRIGATION TODAY";
-	RainGaugeBadgeStyle = RAIN_OK_DO_IRRI || !Params->RainGaugeEnable ? ATT_GREEN : ATT_RED;
+	else if (AnyZoneRespectsRain()) RainGaugeBadge = "NO IRRIGATION TODAY";
+	else                           RainGaugeBadge = "SKIP - but no zone has Respect Rain = Yes";
+	if (RAIN_OK_DO_IRRI || !Params->RainGaugeEnable) RainGaugeBadgeStyle = ATT_GREEN;
+	else RainGaugeBadgeStyle = AnyZoneRespectsRain() ? ATT_RED : ATT_ORANGE;
 
 	if (!Params->RainGaugeEnable || RainGaugeReqQueue == NULL)
 	{
@@ -126,6 +141,7 @@ void MaintainRainGauge()
 	if (res.ok)
 	{
 		RAIN_OK_DO_IRRI = res.irrigate;
+		RainGaugeReason = res.reason;
 		lastGoodMs = millis();
 		RainGaugeStatus = String(res.irrigate ? "IRRIGATE" : "SKIP TODAY") + " - " + res.reason +
 		                  (res.sim ? "  [GAUGE IN SIMULATION]" : "") + "  (read " + at + ")";

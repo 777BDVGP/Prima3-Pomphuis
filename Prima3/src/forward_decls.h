@@ -291,3 +291,4 @@ void TestingTask(void *pvParameters);
 void   SetupRainGauge();
 void   RainGaugeTask(void *pvParameters);
 void   MaintainRainGauge();
+bool   AnyZoneRespectsRain();
