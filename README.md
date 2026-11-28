@@ -9,7 +9,7 @@ one borehole. Everything is a web page on your own WiFi — no cloud, no app.
 
 **Contents:** [Features](#features) · [Hardware](#hardware) · [Pin map](#pin-map) ·
 [Installing the firmware](#installing-the-firmware) · [First start: WiFi](#first-start-wifi) ·
-[Updating](#updating) · [Building the firmware yourself](#building-the-firmware-yourself) ·
+[Using the rain gauge](#using-the-rain-gauge) · [Updating](#updating) · [Building the firmware yourself](#building-the-firmware-yourself) ·
 [Licence](#licence)
 
 > **Who this is for:** someone with hands-on experience in electronics and
@@ -25,8 +25,9 @@ one borehole. Everything is a web page on your own WiFi — no cloud, no app.
   per-weekday suspend, manual or scheduled mode. A 7-day suspend calendar
   switches off all irrigation on chosen days.
 - **Rain gauge** (optional) — asks a [Rain Gauge](https://777bdvgp.github.io/RainGauge/)
-  on the same network every hour whether to irrigate today; zones set to
-  "respect rainfall" are skipped when it says no.
+  on the same network every hour whether to irrigate today; zones with
+  **Respect Rain Gauge Recommendation = Yes** are skipped when it says no.
+  See [Using the rain gauge](#using-the-rain-gauge).
 - **Tank** — fill by float switch or level sensor, any time or only inside a
   time window, start / stop levels, borehole timeout and retry, filter pump
   delay after filling, filter backwash warning from a pressure sensor.
@@ -35,6 +36,8 @@ one borehole. Everything is a web page on your own WiFi — no cloud, no app.
 - **NTFY** — free push alerts on your phone ([ntfy.sh](https://ntfy.sh)): filter
   backwash, borehole pumping, per household.
 - **Reports** — general, irrigation, water used and filter logs (last 200 lines each).
+  The irrigation log has a line when a zone **starts**, when it **ends** (with the
+  duration) and when a run is **skipped**, with the reason (rain gauge, suspended).
 - **Remote pump API** — `/pumpstart`, `/pumpstop`, `/pumpstatus` (60 s heartbeat)
   so another controller can start the borehole pump.
 - **WiFi** — saved networks list (add / delete, passwords never shown), joins the
@@ -98,6 +101,36 @@ up, hold **BOOT (0)**, tap **RST**, release **BOOT** and try again.
 More networks: **SETTINGS → WiFi Networks**. Hold **BOOT** while powering up to open
 the setup hotspot again. If no saved network can be reached for about 4 minutes,
 the hotspot opens by itself for 5 minutes, then the controller restarts and tries again.
+
+## Using the rain gauge
+
+Optional: a [Rain Gauge](https://777bdvgp.github.io/RainGauge/) on the same network
+decides whether the garden needs water today.
+
+1. **SETTINGS** — tick **Use Rain Gauge** and enter its IP as **Rain Gauge IP**
+   (e.g. `192.168.1.50`). The controller asks the gauge at once and then every hour.
+2. **IRRIGATION** — for every zone that must follow the gauge, set
+   **Respect Rain Gauge Recommendation = Yes**. A zone set to **No** waters on its
+   schedule whatever the gauge says.
+
+SETTINGS shows the gauge's last answer and an **Irrigation Today** badge:
+
+| Badge | Meaning |
+|---|---|
+| green **IRRIGATE** | the gauge says water (or Use Rain Gauge is off) |
+| red **NO IRRIGATION TODAY** | the gauge says skip; zones with the setting on Yes are skipped |
+| orange **SKIP - but no zone has Respect Rain Gauge Recommendation = Yes** | the gauge says skip, but no zone listens to it, so they all water |
+
+A skipped run is written to the irrigation log, e.g.
+`Skipped: FRONT - rain gauge: Skip - soil still has water …`, and the zone moves on
+to its next date.
+
+**If the gauge cannot be reached** (no power, WiFi down, wrong IP) the controller
+keeps its last answer for 3 hours, then waters as normal — and after a restart (every
+night at 00:13) it waters as normal at once — so a broken gauge never leaves the
+garden dry for more than a day. The general log says "Rain gauge not reachable" and
+"Rain gauge reachable again". If the rain gauge itself is set to *No Irrigation*
+(plain rain meter) it always answers "irrigate".
 
 ## Updating
 
