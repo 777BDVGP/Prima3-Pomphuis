@@ -61,7 +61,7 @@ void SetupRainGauge() {
 	else               DEBUG_PRINTLN(F("RainGaugeTask creation FAILED"));
 }
 
-// True when at least one active, scheduled zone has "Respect Rain = Yes" —
+// True when at least one active, scheduled zone has "Respect Rain Gauge Recommendation = Yes" —
 // only those zones are skipped when the gauge says so.
 bool AnyZoneRespectsRain(){
 	for (int x = 0; x < IRRIGATE_SELECTIONS; x++){
@@ -95,11 +95,11 @@ void MaintainRainGauge()
 
 	// Badge on the Settings page: green = Prima3 may irrigate, red = skip today,
 	// orange = the gauge says skip but no active scheduled zone has
-	// "Respect Rain = Yes", so the zones water anyway (seen 2026-11-28).
+	// "Respect Rain Gauge Recommendation = Yes", so the zones water anyway (seen 2026-11-28).
 	if (!Params->RainGaugeEnable)  RainGaugeBadge = "IRRIGATE  (rain gauge off)";
 	else if (RAIN_OK_DO_IRRI)      RainGaugeBadge = "IRRIGATE";
 	else if (AnyZoneRespectsRain()) RainGaugeBadge = "NO IRRIGATION TODAY";
-	else                           RainGaugeBadge = "SKIP - but no zone has Respect Rain = Yes";
+	else                           RainGaugeBadge = "SKIP - but no zone has Respect Rain Gauge Recommendation = Yes";
 	if (RAIN_OK_DO_IRRI || !Params->RainGaugeEnable) RainGaugeBadgeStyle = ATT_GREEN;
 	else RainGaugeBadgeStyle = AnyZoneRespectsRain() ? ATT_RED : ATT_ORANGE;
 

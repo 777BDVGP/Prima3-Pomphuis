@@ -11,7 +11,7 @@
 //                   its "irrigate" true/false into RAIN_OK_DO_IRRI.
 //
 // The scheduler (IrrigationShedule, 09_Irrigation.cpp) is unchanged: when a
-// zone with "Respect Rainfall = Yes" is due, RAIN_OK_DO_IRRI false skips it.
+// zone with "Respect Rain Gauge Recommendation = Yes" is due, RAIN_OK_DO_IRRI false skips it.
 //
 // Gauge not reachable: the last good answer is kept for RG_STALE_MS (3 h);
 // after that RAIN_OK_DO_IRRI falls back to true, so the garden is never left

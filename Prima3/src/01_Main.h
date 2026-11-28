@@ -1,7 +1,7 @@
 #pragma once
 
 // Firmware version — shown on the ABOUT page.  Bump it with every change you upload.
-#define FW_VERSION "1.1.2"
+#define FW_VERSION "1.1.3"
 
 // Private defaults (git-ignored wifi_secrets.h, never in the public copy):
 // WiFi networks, and the default names of the two borehole users.

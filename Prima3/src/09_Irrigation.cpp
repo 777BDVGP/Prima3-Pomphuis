@@ -250,7 +250,7 @@ void MapIrrigSetupPage(int Line){
 	IrrigSetupList[i].Var->SetStringToSelect(2); IrrigSetupList[i].Var->AddOption(IRRI_SOURCE_TANK); IrrigSetupList[i].Var->AddOption(IRRI_SOURCE_BOLEHOLE);
 	IrriObject->Selection[Line].WaterSourceID = i + ID_IRRISETUP; i++;
 
-	IrrigSetupList[i].Var = new PageElement(&IrriObject->Selection[Line].RespectRainfail,     "Respect Rain",       "", &SetStyle, i+ID_IRRISETUP);
+	IrrigSetupList[i].Var = new PageElement(&IrriObject->Selection[Line].RespectRainfail,     "Respect Rain Gauge Recommendation", "", &SetStyle, i+ID_IRRISETUP);
 	IrrigSetupList[i].Var->SetStringToSelect(2); IrrigSetupList[i].Var->AddOption(IRRI_RESP_RAIN_NO); IrrigSetupList[i].Var->AddOption(IRRI_RESP_RAIN_YES);
 	IrriObject->Selection[Line].RespectRainfailID = i + ID_IRRISETUP; i++;
 
@@ -1135,7 +1135,7 @@ void IrrigationShedule() {
 					String msg = "Started: " + IrriObject->Selection[x].SelectDescription +
 					             " for " + IrriObject->Selection[x].PeriodToIrrigate;
 					if (!RAIN_OK_DO_IRRI && IrriObject->Selection[x].RespectRainfail != IRRI_RESP_RAIN_YES)
-						msg += " - rain gauge says skip, but this zone has Respect Rain = No";
+						msg += " - rain gauge says skip, but this zone has Respect Rain Gauge Recommendation = No";
 					SaveIrrigationReport(msg);
 				}
 				break;   // Start only one zone at a time
